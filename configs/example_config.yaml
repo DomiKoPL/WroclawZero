@@ -1,0 +1,80 @@
+game: tictactoe/connect4/oware
+data_path: used to store everything
+threads: number of threads to use
+self_play_games: number of maximum number of games in self play
+pit_play_games: number of games played between each agent in pit play
+win_rate_accepted: minimum win rate of agent required to be promoted
+self_play_config:
+  cpuct_init: 1/2/3/4/5/6
+  dirichlet_noise_epsilon: around 0.20
+  dirichlet_noise_alpha: good heuristic 10 / (average number of legal moves) 
+  number_of_iterations_per_turn: 
+  temperature_turns: should be pretty small 
+  temperature_max: 1 or a little bit less
+  temperature_min: 0.5 or more (100 ^ (1 / 0.3) is BIG)
+  init_reserved_nodes: size of nodes array (if it will be too small everything will be slower)
+
+validation_config:
+  same as self_play_config
+
+pit_play_config:
+  same as self_play_config
+
+learning:
+  lr:
+  weight_decay: 
+  batch_size:
+  epochs: number of maximum epochs in python training (formula for epoch = min(generation, max_epochs))
+  max_memory_size: maximum number of generations stored in memory
+
+model:
+  # Input layer is required for models using Conv2d
+  - type: Input
+    shape: [1, 3, 3]
+
+  # Conv2d - standard, like in pytorch
+  - type: Conv2d
+      in_channels: 1
+      out_channels: 16
+      kernel: [4, 4] # or 4
+      stride: 1 # or [1, 1]
+      padding: 0 # or [0, 0]
+      activation:
+
+  - type: Flatten
+
+
+  - type: Linear
+    input: number of inputs
+    output: number of outputs
+    activation:
+
+  activations:
+    ReLU
+    Sigmoid
+    Softmax
+    Tanh
+
+  # !!! last layer have to be linear!!!
+  - type: Linear
+    input: X
+    output: 1 + <policy size>
+  # Tanh for value, and softmax for policy will be applied
+
+# validators will be run every time there is a new best model
+# they will be run in parallel with python training
+validators:
+  - type: RandomAgent
+    games: number of games
+
+  # This agent will use eval from game
+  - type: Depth1Agent
+    games: 
+
+  # you can specify another model to play against
+  - type: model
+    games: 
+    data_path: where this agent is stored
+    config:
+
+    model:

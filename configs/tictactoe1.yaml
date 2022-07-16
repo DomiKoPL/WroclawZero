@@ -1,0 +1,61 @@
+game: tictactoe
+data_path: data/tictactoe/1
+threads: 8
+self_play_games: 2000
+pit_play_games: 200
+win_rate_accepted: 55
+self_play_config:
+  cpuct_init: 4
+  dirichlet_noise_epsilon: 0.20
+  dirichlet_noise_alpha: 2
+  number_of_iterations_per_turn: 50
+  temperature_turns: 2
+  temperature_max: 1
+  temperature_min: 1
+  init_reserved_nodes: 10000
+
+validation_config:
+  cpuct_init: 4
+  dirichlet_noise_epsilon: 0.10
+  dirichlet_noise_alpha: 2
+  number_of_iterations_per_turn: 50
+  temperature_turns: 0
+  temperature_max: 1
+  temperature_min: 1
+  init_reserved_nodes: 10000
+
+pit_play_config:
+  cpuct_init: 4
+  dirichlet_noise_epsilon: 0.20
+  dirichlet_noise_alpha: 2
+  number_of_iterations_per_turn: 50
+  temperature_turns: 0
+  temperature_max: 1
+  temperature_min: 1
+  init_reserved_nodes: 10000
+
+learning:
+  lr: 0.03
+  weight_decay: 1e-4
+  batch_size: 128
+  epochs: 10
+  max_memory_size: 10
+
+model:
+  - type: Linear
+    input: 18
+    output: 64
+    activation: Tanh
+  - type: Linear
+    input: 64
+    output: 64
+    activation: Tanh
+  - type: Linear
+    input: 64
+    output: 10
+
+# validators will be run every time there is a new best model
+# they will be run in parallel with python training
+validators:
+  - type: RandomAgent
+    games: 50
